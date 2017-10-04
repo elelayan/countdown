@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf8">
+<title>AXT Countdown</title>
+<style type="text/css">
+
+body {
+    text-align: center;
+    background: slategray;
+}
+
+#start-stop {
+    font-size: 20vh;
+}
+
+button:focus {
+    border: solid 10px gray;
+}
+
+body.running {
+    background: green;
+}
+
+body.running.ending {
+    background: orange
+}
+
+body.stopped {
+    background: red;
+}
+
+body.running #time,
+body.stopped #time {
+    color: white;
+}
+
+body.running #times {
+    opacity: 0.5;
+}
+
+#time {
+    /*margin: 5vh 0;*/
+    margin: 1em 0;
+    font-size: 100px;
+    /*font-size: 10vh;*/
+    text-align: center;
+}
+
+button {
+    font-size: 100px;
+    /*font-size: 10vh;*/
+}
+#times {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+}
+
+#times button {
+    margin-left: 20px;
+}
+</style>
+</head>
+<body id="b">
+    <button id="start-stop" autofocus>Start</button>
+
+    <p id="time">00:00</p>
+
+    <ul id="times">
+        <button>02:00</button>
+        <button>05:00</button>
+    </ul>
+</body>
+
+<script type="text/javascript">
+var defaultTime = 2 * 60;
+var countDownId = 0;
+var currentTime = defaultTime;
+
+var b, s, t;
+
+function iter(seq){
+    return Array.prototype.slice.apply(seq);
+}
+
+function formatTime(t) {
+    if(t < 0){
+        t = 0;
+    }
+    var m = Math.floor(t / 60);
+    var s = t % 60;
+    
+    return ((m<10) ? "0" : "") + m + ":" + ((s<10) ? "0" : "") + s;
+}
+
+var re = /^([0-9]+):([0-9]+)$/;
+function parseTime(s) {
+    var res = re.exec(s);
+    if (res) {
+        return res[1] * 60 + res[2] * 1;
+    } else {
+        return 0;
+    }
+}
+
+function chrono() {
+    currentTime--;
+    display();
+    if (currentTime <= 0) {
+         stop();
+    }
+}
+
+function display() {
+    console.log("display", countDownId, currentTime);
+    t.innerText = formatTime(currentTime);
+    b.classList.remove("running");
+    b.classList.remove("stopped");
+    b.classList.remove("ending");
+    s.innerText = "Start";
+    if(countDownId) {
+        if(currentTime > 0){
+            s.innerText = "Stop";
+            b.classList.add("running");
+            if(currentTime <= 15){
+                b.classList.add("ending");
+            }
+        }else{
+            b.classList.add("stopped");
+        }
+    }
+}
+
+function start() {
+    console.log("starting...");
+    stop();
+    currentTime = defaultTime;
+    countDownId = setInterval(chrono, 1000);
+    display();
+}
+
+function stop() {
+    if(countDownId) {
+        clearInterval(countDownId);
+        countDownId = 0;
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+        b = document.getElementById("b");
+        s = document.getElementById("start-stop");
+        t = document.getElementById("time");
+        display();
+        
+        document.getElementById("start-stop").addEventListener("click", function(e){
+                if(b.classList.contains("running")){
+                    currentTime = defaultTime;
+                    stop();
+                    display();
+                } else {
+                    start();
+                }
+        });
+        
+        iter(document.querySelectorAll("#times button")).forEach(function(b){
+                b.addEventListener("click", function(){
+                        var t = parseTime(b.innerText);
+                        if(t > 0) {
+                            defaultTime = t;
+                            start();
+                        } else {
+                            alert("Invalid time spec: " + b.innerText);
+                        }
+                });
+        });
+});
+</script>
+</html>
