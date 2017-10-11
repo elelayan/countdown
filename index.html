@@ -22,6 +22,10 @@ body.running {
     background: green;
 }
 
+body.running.half {
+    background: darkgreen
+}
+    
 body.running.ending {
     background: orange
 }
@@ -137,6 +141,7 @@ function display() {
     b.classList.remove("stopped");
     b.classList.remove("ending");
     b.classList.remove("paused");
+    b.classList.remove("half");
     s.innerText = "Start";
     if(countDownId) {
         if(currentTime > 0){
@@ -147,6 +152,9 @@ function display() {
                 s.innerText = "Resume";
             } else if(currentTime <= 15){
                 b.classList.add("ending");
+                b.classList.remove("half");
+            } else if(currentTime <= defaultTime/2){
+                b.classList.add("half");
             }
         }else{
             b.classList.add("stopped");
