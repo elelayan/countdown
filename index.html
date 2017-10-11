@@ -10,7 +10,7 @@ body {
     background: slategray;
 }
 
-#start-stop {
+#start-pause, #stop {
     font-size: 20vh;
 }
 
@@ -24,6 +24,10 @@ body.running {
 
 body.running.ending {
     background: orange
+}
+
+body.running.paused {
+    background: black;
 }
 
 body.stopped {
@@ -61,10 +65,20 @@ button {
 #times button {
     margin-left: 20px;
 }
+
+#stop {
+    visibility: hidden;
+}
+
+body.running #stop {
+    visibility: visible;
+}
+
 </style>
 </head>
 <body id="b">
-    <button id="start-stop" autofocus>Start</button>
+    <button id="start-pause" autofocus>Start</button>
+    <button id="stop">Stop</button>
 
     <p id="time">00:00</p>
 
@@ -78,6 +92,7 @@ button {
 var defaultTime = 2 * 60;
 var countDownId = 0;
 var currentTime = defaultTime;
+var paused = false;
 
 var b, s, t;
 
@@ -106,10 +121,12 @@ function parseTime(s) {
 }
 
 function chrono() {
-    currentTime--;
-    display();
-    if (currentTime <= 0) {
-         stop();
+    if (!paused) {
+        currentTime--;
+        display();
+        if (currentTime <= 0) {
+             stop();
+        }
     }
 }
 
@@ -119,12 +136,16 @@ function display() {
     b.classList.remove("running");
     b.classList.remove("stopped");
     b.classList.remove("ending");
+    b.classList.remove("paused");
     s.innerText = "Start";
     if(countDownId) {
         if(currentTime > 0){
-            s.innerText = "Stop";
+            s.innerText = "Pause";
             b.classList.add("running");
-            if(currentTime <= 15){
+            if(paused){
+                b.classList.add("paused");
+                s.innerText = "Resume";
+            } else if(currentTime <= 15){
                 b.classList.add("ending");
             }
         }else{
@@ -137,6 +158,7 @@ function start() {
     console.log("starting...");
     stop();
     currentTime = defaultTime;
+    paused = false;
     countDownId = setInterval(chrono, 1000);
     display();
 }
@@ -150,20 +172,25 @@ function stop() {
 
 document.addEventListener('DOMContentLoaded', function(){
         b = document.getElementById("b");
-        s = document.getElementById("start-stop");
+        s = document.getElementById("start-pause");
         t = document.getElementById("time");
         display();
         
-        document.getElementById("start-stop").addEventListener("click", function(e){
+        document.getElementById("start-pause").addEventListener("click", function(e){
                 if(b.classList.contains("running")){
-                    currentTime = defaultTime;
-                    stop();
+                    paused = !b.classList.contains("paused");
                     display();
                 } else {
                     start();
                 }
         });
         
+        document.getElementById("stop").addEventListener("click", function(e){
+            currentTime = defaultTime;
+            stop();
+            display();
+        });
+
         iter(document.querySelectorAll("#times button")).forEach(function(b){
                 b.addEventListener("click", function(){
                         var t = parseTime(b.innerText);
