@@ -88,12 +88,12 @@ body.running #stop {
 
     <ul id="times">
         <button>02:00</button>
-        <button>05:00</button>
+        <button>10:00</button>
     </ul>
 </body>
 
 <script type="text/javascript">
-var defaultTime = 2 * 60;
+var defaultTime = 5 * 60;
 var countDownId = 0;
 var currentTime = defaultTime;
 var paused = false;
@@ -150,7 +150,7 @@ function display() {
             if(paused){
                 b.classList.add("paused");
                 s.innerText = "Resume";
-            } else if(currentTime <= 15){
+            } else if(currentTime <= 60){
                 b.classList.add("ending");
                 b.classList.remove("half");
             } else if(currentTime <= defaultTime/2){
