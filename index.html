@@ -107,7 +107,7 @@ function iter(seq){
 
 function formatTime(t) {
     if(t < 0){
-        t = 0;
+        t = -1 * t;
     }
     var m = Math.floor(t / 60);
     var s = t % 60;
@@ -129,9 +129,6 @@ function chrono() {
     if (!paused) {
         currentTime--;
         display();
-        if (currentTime <= 0) {
-             stop();
-        }
     }
 }
 
